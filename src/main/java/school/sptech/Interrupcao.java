@@ -8,16 +8,18 @@ public class Interrupcao {
     private LocalDateTime inicio;
     private LocalDateTime fim;
     private String fatorGerador;
+    private Long duracao;
 
     public Interrupcao() {
     }
 
-    public Interrupcao(Integer id, String unidadeConsumidora, LocalDateTime inicio, LocalDateTime fim, String fatorGerador) {
+    public Interrupcao(Integer id, String unidadeConsumidora, LocalDateTime inicio, LocalDateTime fim, String fatorGerador, Long duracao) {
         this.id = id;
         this.unidadeConsumidora = unidadeConsumidora;
         this.inicio = inicio;
         this.fim = fim;
         this.fatorGerador = fatorGerador;
+        this.duracao = duracao;
     }
 
     public Integer getId() {
@@ -60,6 +62,14 @@ public class Interrupcao {
         this.fatorGerador = fatorGerador;
     }
 
+    public Long getDuracao() {
+        return duracao;
+    }
+
+    public void setDuracao(Long duracao) {
+        this.duracao = duracao;
+    }
+
     @Override
     public String toString() {
         return "Interrupcao{" +
@@ -68,6 +78,7 @@ public class Interrupcao {
                 ", inicio=" + inicio +
                 ", fim=" + fim +
                 ", fatorGerador='" + fatorGerador + '\'' +
+                ", duracao=" + duracao +
                 '}';
     }
 }
