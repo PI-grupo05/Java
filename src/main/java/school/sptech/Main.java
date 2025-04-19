@@ -1,5 +1,9 @@
 package school.sptech;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,6 +29,31 @@ public class Main {
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
+
+
         }
+
+            Conexao conexao = new Conexao();
+            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+
+        for (Interrupcao interrupcao : interrupcoes) {
+            try {
+                template.update(
+                        "INSERT INTO interrupcao VALUES (?, ?, ?, ?, ?)",
+                        null,
+                        interrupcao.getUnidadeConsumidora(),
+                        interrupcao.getInicio(),
+                        interrupcao.getFim(),
+                        interrupcao.getFatorGerador()
+                );
+                System.out.println("Inserida interrupção ID: " + interrupcao.getId());
+            } catch (DataAccessException e) {
+                System.err.println("Erro ao inserir interrupção ID " + interrupcao.getId() + ": " + e.getMessage());
+            }
+        }
+
+        System.out.println("Passei no teste!");
     }
+
+
 }
