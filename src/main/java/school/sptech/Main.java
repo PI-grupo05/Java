@@ -38,12 +38,23 @@ public class Main {
 
         for (Interrupcao interrupcao : interrupcoes) {
             try {
+                Integer count = template.queryForObject(
+                        "SELECT COUNT(*) FROM interrupcao WHERE id_interrupcao = ?",
+                        Integer.class,
+                        interrupcao.getId()
+                );
+
+                if (count > 0) {
+                    System.out.println("Interrupção com ID " + interrupcao.getId() + " já existe. Pulando inserção.");
+                    continue;
+                }
+
                 template.update(
-                        "INSERT INTO interrupcao VALUES (?, ?, ?, ?, ?)",
-                        null,
-                        interrupcao.getUnidadeConsumidora(),
+                        "INSERT INTO interrupcao (id_interrupcao, dt_inicio, dt_fim, cidade, motivo) VALUES (?, ?, ?, ?, ?)",
+                        interrupcao.getId(),
                         interrupcao.getInicio(),
                         interrupcao.getFim(),
+                        interrupcao.getUnidadeConsumidora(),
                         interrupcao.getFatorGerador()
                 );
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());

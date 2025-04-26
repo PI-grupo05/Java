@@ -54,7 +54,10 @@ public class LeitorExcel {
                 interrupcao.setUnidadeConsumidora(row.getCell(3).getStringCellValue());
                 interrupcao.setInicio(row.getCell(9).getLocalDateTimeCellValue());
                 interrupcao.setFim(row.getCell(10).getLocalDateTimeCellValue());
-                interrupcao.setFatorGerador(row.getCell(11).getStringCellValue());
+                String fatorCompleto = row.getCell(11).getStringCellValue();
+                String[] partes = fatorCompleto.split(" - ");
+                String fatorPrincipal = partes[partes.length - 1].trim();
+                interrupcao.setFatorGerador(fatorPrincipal);
 
                 interrupcoesExtraidas.add(interrupcao);
             }
