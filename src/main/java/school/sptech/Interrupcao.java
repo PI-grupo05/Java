@@ -8,16 +8,23 @@ public class Interrupcao {
     private LocalDateTime inicio;
     private LocalDateTime fim;
     private String fatorGerador;
+    private String distribuidora;
+    private String cnpj;
+    private String siglaDistro;
 
     public Interrupcao() {
     }
 
-    public Interrupcao(Integer id, String unidadeConsumidora, LocalDateTime inicio, LocalDateTime fim, String fatorGerador) {
+    public Interrupcao(Integer id, String unidadeConsumidora, LocalDateTime inicio, LocalDateTime fim, String fatorGerador, String distribuidora ,
+                       String siglaDistro,String cnpj) {
         this.id = id;
         this.unidadeConsumidora = unidadeConsumidora;
         this.inicio = inicio;
         this.fim = fim;
         this.fatorGerador = fatorGerador;
+        this.distribuidora = distribuidora;
+        this.siglaDistro = siglaDistro;
+        this.cnpj = cnpj;
     }
 
     public Integer getId() {
@@ -60,6 +67,30 @@ public class Interrupcao {
         this.fatorGerador = fatorGerador;
     }
 
+    public String getDistribuidora() {
+        return distribuidora;
+    }
+
+    public void setDistribuidora(String distribuidora) {
+        this.distribuidora = distribuidora;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
+
+    public String getSiglaDistro() {
+        return siglaDistro;
+    }
+
+    public void setSiglaDistro(String siglaDistro) {
+        this.siglaDistro = siglaDistro;
+    }
+
     @Override
     public String toString() {
         return "Interrupcao{" +
@@ -68,6 +99,9 @@ public class Interrupcao {
                 ", inicio=" + inicio +
                 ", fim=" + fim +
                 ", fatorGerador='" + fatorGerador + '\'' +
+                ", distribuidora='" + distribuidora + '\'' +
+                ", siglaDistro='" + siglaDistro + '\'' +
+                ", cnpj='" + cnpj + '\'' +
                 '}';
     }
 }

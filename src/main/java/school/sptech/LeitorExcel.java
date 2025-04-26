@@ -55,9 +55,12 @@ public class LeitorExcel {
                 interrupcao.setInicio(row.getCell(9).getLocalDateTimeCellValue());
                 interrupcao.setFim(row.getCell(10).getLocalDateTimeCellValue());
                 String fatorCompleto = row.getCell(11).getStringCellValue();
-                String[] partes = fatorCompleto.split(" - ");
+                String[] partes = fatorCompleto.split(";");
                 String fatorPrincipal = partes[partes.length - 1].trim();
                 interrupcao.setFatorGerador(fatorPrincipal);
+                interrupcao.setDistribuidora(row.getCell(16).getStringCellValue());
+                interrupcao.setSiglaDistro(row.getCell(17).getStringCellValue());
+                interrupcao.setCnpj(row.getCell(18).getStringCellValue());
 
                 interrupcoesExtraidas.add(interrupcao);
             }
