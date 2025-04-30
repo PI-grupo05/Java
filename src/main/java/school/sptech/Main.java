@@ -2,33 +2,55 @@ package school.sptech;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        String nomeArquivo = "paraTreinarApache.xlsx";
+        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
+        String nomeBucket = "bucket-dataryzer";
 
-        // Carregando o arquivo excel
-        Path caminho = Path.of(nomeArquivo);
-        InputStream arquivo = Files.newInputStream(caminho);
+        // Ferramenta que fará a leitura
+        InputStream arquivo = null;
 
-        // Extraindo os livros do arquivo
-        LeitorExcel leitorExcel = new LeitorExcel();
-        List<Interrupcao> interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivo, arquivo);
+        //Para acessar a S3
+        S3Client s3Client = new S3Provider().getS3Client();
 
-        // Fechando o arquivo após a extração
-        arquivo.close();
+        // Faz a listagem de todos os arquivos no bucket
+        try {
+            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
+            for (S3Object object : objects) {
+                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                        .bucket(nomeBucket)
+                        .key(object.key())
+                        .build();
+
+            // Se achar o arquivo, guardar para realizar a leitura
+                if(object.key().equals(nomeArquivoParaProcurar)){
+                    arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+                }
+            }
+                // Extraindo as interrupções do arquivo
+                LeitorExcel leitorExcel = new LeitorExcel();
+                List<Interrupcao> interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+
+                // Fechando o arquivo após a extração
+                arquivo.close();
+
+        
+        } catch (  S3Exception e) {
+            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
+        }            
 
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
-
 
         }
 
@@ -174,6 +196,7 @@ public class Main {
         }
 
         System.out.println("Passei no teste!");
+
     }
 
 

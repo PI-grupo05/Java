@@ -2,6 +2,7 @@ package school.sptech;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class LeitorExcel {
                     continue;
                 }
 
-                // Extraindo valor das células e criando objeto Livro
+                // Extraindo valor das células e criando objeto Interrupcao
                 System.out.println("Lendo linha " + row.getRowNum());
 
                 Interrupcao interrupcao = new Interrupcao();
