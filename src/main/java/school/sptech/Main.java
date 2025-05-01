@@ -8,14 +8,15 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
         String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
-        String nomeBucket = "bucket-dataryzer";
-
+        String nomeBucket = "dataryzer";
+        List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
         // Ferramenta que fará a leitura
         InputStream arquivo = null;
 
@@ -38,7 +39,7 @@ public class Main {
             }
                 // Extraindo as interrupções do arquivo
                 LeitorExcel leitorExcel = new LeitorExcel();
-                List<Interrupcao> interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+                interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
 
                 // Fechando o arquivo após a extração
                 arquivo.close();
@@ -46,7 +47,7 @@ public class Main {
         
         } catch (  S3Exception e) {
             System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
-        }            
+        }
 
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
@@ -198,6 +199,5 @@ public class Main {
         System.out.println("Passei no teste!");
 
     }
-
 
 }

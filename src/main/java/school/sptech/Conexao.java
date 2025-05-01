@@ -15,7 +15,7 @@ public class Conexao{
         basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         basicDataSource.setUrl("jdbc:mysql://dataryzer-net:3306/dataryzer?useSSL=false&serverTimezone=UTC");
         basicDataSource.setUsername("root");
-        basicDataSource.setPassword("Blocounico15!");
+        basicDataSource.setPassword("41465490Fe");
 
         // Configurações opcionais (recomendadas para produção)
         basicDataSource.setInitialSize(5);  // Pool inicial de conexões
