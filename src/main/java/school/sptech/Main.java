@@ -46,7 +46,23 @@ public class Main {
 
         
         } catch (  S3Exception e) {
+
             System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
+
+            // Teste de adicionar dados ao logggg
+
+            Conexao conexao = new Conexao();
+            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+            String erroInserir = "Erro ao fazer download dos arquivos: ";
+            
+            Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
+            System.err.println("Erro capturado: " + e.getMessage());
+
+
+            // FIm do teste de adicionar ao log
         }
 
         System.out.println("Interrupções extraídas:");
@@ -81,6 +97,20 @@ public class Main {
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcaoDistro.getId() + ": " + e.getMessage());
+
+
+                // Teste de adicionar dados ao logggg
+
+                String erroInserir = "Erro ao inserir distribuidora";
+                Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
+                System.err.println("Erro capturado: " + e.getMessage());
+
+
+                // FIm do teste de adicionar ao log
+
             }
         }
 
@@ -118,6 +148,19 @@ public class Main {
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcaoCidade.getId() + ": " + e.getMessage());
+
+
+                // Teste de adicionar dados ao logggg
+
+                String erroInserir = "Erro ao inserir cidade";
+                Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
+                System.err.println("Erro capturado: " + e.getMessage());
+
+
+                // FIm do teste de adicionar ao log
             }
         }
 
@@ -142,6 +185,19 @@ public class Main {
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcoeMotivo.getId() + ": " + e.getMessage());
+
+
+                // Teste de adicionar dados ao logggg
+
+                String erroInserir = "Erro ao inserir motivo ";
+                Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
+                System.err.println("Erro capturado: " + e.getMessage());
+
+
+                // FIm do teste de adicionar ao log
             }
         }
 
@@ -193,6 +249,20 @@ public class Main {
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
             } catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcao.getId() + ": " + e.getMessage());
+
+
+                // Teste de adicionar dados ao logggg
+
+                String erroInserir = "Erro ao inserir interrupção";
+                Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
+                System.err.println("Erro capturado: " + e.getMessage());
+
+
+                // FIm do teste de adicionar ao log
+
             }
         }
 
