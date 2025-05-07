@@ -88,9 +88,8 @@
 
 
 	create table log(
-    id_log 				int primary key auto_increment not null,
-    data_hora 			timestamp default current_timestamp,
-    nivel				varchar(15) not null,
-    mensagem			varchar(255) not null,
-    mensagem_log		varchar(255) not null
-    );
+	idLog 				int primary key auto_increment not null,
+	mensagem			varchar(100),
+	data_hora 			datetime not null,
+	tipo_processo		varchar(45) not null
+	);

@@ -54,7 +54,7 @@ public class Main {
             Conexao conexao = new Conexao();
             JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
             String erroInserir = "Erro ao fazer download dos arquivos: ";
-            
+
             Log log = new Log("ERRO",erroInserir, e.getMessage());
 
             LogInserir loginserir = new LogInserir(template);
