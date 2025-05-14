@@ -1,16 +1,18 @@
-package school.sptech;
+package school.sptech.main;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import school.sptech.config.Conexao;
+import school.sptech.modulos.Interrupcao;
+import school.sptech.modulos.Log;
+import school.sptech.modulos.UnidadeDistribuidora;
+import school.sptech.service.LeitorExcel;
+import school.sptech.service.LogInserir;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -144,7 +146,7 @@ public class Main {
                 Integer countDistros = template.queryForObject(
                         "SELECT COUNT(*) FROM cidade WHERE nome = ?",
                         Integer.class,
-                        interrupcaoCidade.getUnidadeConsumidora()
+                        UnidadeDistribuidora.getDistribuidora()
                 );
 
                 if (countDistros > 0) {

@@ -1,7 +1,6 @@
-package school.sptech;
+package school.sptech.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
