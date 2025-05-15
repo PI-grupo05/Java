@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 public class Log {
 
-
     private Integer idLog;
     private LocalDateTime dataHora;
     private String nivel;

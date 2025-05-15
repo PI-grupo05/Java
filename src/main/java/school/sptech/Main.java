@@ -8,6 +8,8 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,8 @@ public class Main {
         String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
         String nomeBucket = "dataryzer";
         List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
+        Conexao conexao = new Conexao();
+        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
         // Ferramenta que fará a leitura
         InputStream arquivo = null;
 
@@ -32,27 +36,31 @@ public class Main {
                         .key(object.key())
                         .build();
 
-            // Se achar o arquivo, guardar para realizar a leitura
+                // Se achar o arquivo, guardar para realizar a leitura
                 if(object.key().equals(nomeArquivoParaProcurar)){
                     arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
                 }
             }
-                // Extraindo as interrupções do arquivo
-                LeitorExcel leitorExcel = new LeitorExcel();
-                interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+            // Extraindo as interrupções do arquivo
+            LeitorExcel leitorExcel = new LeitorExcel();
+            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
 
-                // Fechando o arquivo após a extração
-                arquivo.close();
+            // Fechando o arquivo após a extração
+            arquivo.close();
 
-        
+            String informacao = "Exito na extração do arquivo em S3 ";
+            Log log = new Log("INFO",informacao, nomeArquivoParaProcurar);
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
+
+
         } catch (  S3Exception e) {
 
             System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
 
             // Teste de adicionar dados ao logggg
 
-            Conexao conexao = new Conexao();
-            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
             String erroInserir = "Erro ao fazer download dos arquivos: ";
 
             Log log = new Log("ERRO",erroInserir, e.getMessage());
@@ -65,14 +73,27 @@ public class Main {
             // FIm do teste de adicionar ao log
         }
 
+
+//       // String nomeArquivo = "paraTreinarApache.xlsx";
+//            String nomeArquivo = "C:\\Users\\Miguel\\Desktop\\Sptech\\Pesquisa e Inovação\\repositorio\\dataryzerB\\MasterJava\\Java\\paraTreinarApache.xlsx";
+//        // Carregando o arquivo excel
+//        Path caminho = Path.of(nomeArquivo);
+//        InputStream arquivo = Files.newInputStream(caminho);
+//
+//        // Extraindo os livros do arquivo
+//        LeitorExcel leitorExcel = new LeitorExcel();
+//        List<Interrupcao> interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivo, arquivo);
+//
+//        // Fechando o arquivo após a extração
+//        arquivo.close();
+
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
 
+
         }
 
-            Conexao conexao = new Conexao();
-            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
 
         // inserção distribuidora
 
@@ -93,7 +114,16 @@ public class Main {
                         interrupcaoDistro.getCnpj(),
                         interrupcaoDistro.getDistribuidora(),
                         interrupcaoDistro.getSiglaDistro()
+
+
                 );
+                String informacao = "CNPJ, DISTRIBUIDORA e SIGLA, iseridas no banco";
+                Log log = new Log("INFO",informacao, interrupcaoDistro.getCnpj()
+                        +" - " + interrupcaoDistro.getDistribuidora() +" - " +
+                        interrupcaoDistro.getSiglaDistro() + " Informações adicionadas com sucesso!!");
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcaoDistro.getId() + ": " + e.getMessage());
@@ -134,6 +164,7 @@ public class Main {
                         interrupcaoCidade.getDistribuidora()
                 );
 
+
                 if (idDistribuidora == null) {
                     System.out.println("Distribuidora " + interrupcaoCidade.getDistribuidora() + " não encontrada. Pulando inserção.");
                     continue;
@@ -145,6 +176,13 @@ public class Main {
                         interrupcaoCidade.getUnidadeConsumidora(),
                         idDistribuidora
                 );
+
+                String informacao = "UNIDADE CONSUMIDORA extraida ";
+                Log log = new Log("INFO",informacao, interrupcaoCidade.getUnidadeConsumidora()
+                        + " Informações inseridas com sucesso!!");
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcaoCidade.getId() + ": " + e.getMessage());
@@ -182,6 +220,13 @@ public class Main {
                         "INSERT INTO motivo (nome) VALUES (?)",
                         interrupcoeMotivo.getFatorGerador()
                 );
+
+                String informacao = "MOTIVO CAUSADOR inserido ";
+                Log log = new Log("INFO",informacao, interrupcoeMotivo.getFatorGerador()
+                        + " Informações inseridas com sucesso!!");
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
             }
             catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcoeMotivo.getId() + ": " + e.getMessage());
@@ -247,6 +292,12 @@ public class Main {
                         idMotivo
                 );
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
+                String informacao = "INICIO E FIM de interrupção extraída ";
+                Log log = new Log("INFO",informacao, interrupcao.getInicio() + " - " +
+                        interrupcao.getFim() + " Informações inseridas com sucesso!!");
+
+                LogInserir loginserir = new LogInserir(template);
+                loginserir.registrarLog(log);
             } catch (DataAccessException e) {
                 System.err.println("Erro ao inserir interrupção ID " + interrupcao.getId() + ": " + e.getMessage());
 
