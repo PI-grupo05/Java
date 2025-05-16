@@ -7,12 +7,16 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import school.sptech.modulos.Distribuidora;
 import school.sptech.modulos.Interrupcao;
+import school.sptech.modulos.UnidadeDistribuidora;
 
 public class LeitorExcel {
 
@@ -20,7 +24,6 @@ public class LeitorExcel {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
-            // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
             if (nomeArquivo.endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(arquivo);
@@ -32,53 +35,53 @@ public class LeitorExcel {
 
             List<Interrupcao> interrupcoesExtraidas = new ArrayList<>();
 
-            // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
-
                 if (row.getRowNum() == 0) {
                     System.out.println("\nLendo cabeçalho");
-
                     for (int i = 0; i < 19; i++) {
                         String coluna = row.getCell(i).getStringCellValue();
                         System.out.println("Coluna " + i + ": " + coluna);
                     }
-
                     System.out.println("--------------------");
                     continue;
                 }
 
-                // Extraindo valor das células e criando objeto Interrupcao
                 System.out.println("Lendo linha " + row.getRowNum());
 
                 Interrupcao interrupcao = new Interrupcao();
                 interrupcao.setId((int) row.getCell(0).getNumericCellValue());
-                interrupcao.setUnidadeConsumidora(row.getCell(3).getStringCellValue());
                 interrupcao.setInicio(row.getCell(9).getLocalDateTimeCellValue());
                 interrupcao.setFim(row.getCell(10).getLocalDateTimeCellValue());
+
                 String fatorCompleto = row.getCell(11).getStringCellValue();
                 String[] partes = fatorCompleto.split(";");
                 String fatorPrincipal = partes[partes.length - 1].trim();
                 interrupcao.setFatorGerador(fatorPrincipal);
-                interrupcao.setDistribuidora(row.getCell(16).getStringCellValue());
-                interrupcao.setSiglaDistro(row.getCell(17).getStringCellValue());
-                interrupcao.setCnpj(row.getCell(18).getStringCellValue());
+
+                // Criando a Distribuidora
+                String nomeDistribuidora = row.getCell(16).getStringCellValue();
+                String sigla = row.getCell(17).getStringCellValue();
+                String cnpj = row.getCell(18).getStringCellValue();
+                Distribuidora distribuidora = new Distribuidora(cnpj, nomeDistribuidora, sigla);
+
+                // Criando a UnidadeDistribuidora
+                String nomeUnidade = row.getCell(3).getStringCellValue();
+                UnidadeDistribuidora unidade = new UnidadeDistribuidora(nomeUnidade, distribuidora);
+
+                // Associando à interrupção
+                interrupcao.setUnidadeConsumidora(unidade);
 
                 interrupcoesExtraidas.add(interrupcao);
             }
 
-            // Fechando o workbook após a leitura
             workbook.close();
-
             System.out.println("\nLeitura do arquivo finalizada\n");
 
             return interrupcoesExtraidas;
         } catch (IOException e) {
-            // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             throw new RuntimeException(e);
         }
     }
-
-
 
     private LocalDate converterDate(Date data) {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();

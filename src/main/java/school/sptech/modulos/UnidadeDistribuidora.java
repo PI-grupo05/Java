@@ -1,17 +1,22 @@
 package school.sptech.modulos;
 
 public class UnidadeDistribuidora {
-    private String unidadeConsumidora;
+    private Integer id;
+    private String nome;
+    private Distribuidora distribuidora;
 
-    public String getUnidadeConsumidora() {
-        return unidadeConsumidora;
+    public UnidadeDistribuidora() {}
+
+    public UnidadeDistribuidora(String nome, Distribuidora distribuidora) {
+        this.nome = nome;
+        this.distribuidora = distribuidora;
     }
 
-    public void setUnidadeConsumidora(String unidadeConsumidora) {
-        this.unidadeConsumidora = unidadeConsumidora;
-    }
-
-    public UnidadeDistribuidora(String unidadeConsumidora) {
-        this.unidadeConsumidora = unidadeConsumidora;
-    }
+    // Getters e Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public Distribuidora getDistribuidora() { return distribuidora; }
+    public void setDistribuidora(Distribuidora distribuidora) { this.distribuidora = distribuidora; }
 }

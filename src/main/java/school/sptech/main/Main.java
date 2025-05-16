@@ -3,6 +3,7 @@ package school.sptech.main;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import school.sptech.config.Conexao;
+import school.sptech.modulos.Distribuidora;
 import school.sptech.modulos.Interrupcao;
 import school.sptech.modulos.Log;
 import school.sptech.modulos.UnidadeDistribuidora;
@@ -88,146 +89,104 @@ public class Main {
 //            // FIm do teste de adicionar ao log
 //        }
 
-
-
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
-
         }
 
-            Conexao conexao = new Conexao();
-            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+        Conexao conexao = new Conexao();
+        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
 
         // inserção distribuidora
-
         for (Interrupcao interrupcaoDistro : interrupcoes) {
-            try{
+            try {
+                Distribuidora distro = interrupcaoDistro.getUnidadeConsumidora().getDistribuidora();
+
+
                 Integer countDistros = template.queryForObject(
                         "SELECT COUNT(*) FROM distribuidora WHERE nome = ?",
                         Integer.class,
-                        interrupcaoDistro.getDistribuidora()
+                        distro.getDistribuidora()
                 );
 
-                if (countDistros > 0) {
-                    continue;
-                }
+                if (countDistros > 0) continue;
 
                 template.update(
-                        "INSERT INTO distribuidora (cnpj,nome,sigla) VALUES (?, ?, ?)",
-                        interrupcaoDistro.getCnpj(),
-                        interrupcaoDistro.getDistribuidora(),
-                        interrupcaoDistro.getSiglaDistro()
+                        "INSERT INTO distribuidora (cnpj, nome, sigla) VALUES (?, ?, ?)",
+                        distro.getCnpj(),
+                        distro.getDistribuidora(),
+                        distro.getSiglaDistro()
                 );
-            }
-            catch (DataAccessException e) {
-                System.err.println("Erro ao inserir interrupção ID " + interrupcaoDistro.getId() + ": " + e.getMessage());
-
-
-                // Teste de adicionar dados ao logggg
-
+            } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir distribuidora";
-                Log log = new Log("ERRO",erroInserir, e.getMessage());
-
-                LogInserir loginserir = new LogInserir(template);
-                loginserir.registrarLog(log);
+                Log log = new Log("ERRO", erroInserir, e.getMessage());
+                new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
-
-
-                // FIm do teste de adicionar ao log
-
             }
         }
 
         // inserção da cidade
-
         for (Interrupcao interrupcaoCidade : interrupcoes) {
-            try{
-                Integer countDistros = template.queryForObject(
+            try {
+                UnidadeDistribuidora unidade = interrupcaoCidade.getUnidadeConsumidora();
+                Distribuidora distribuidora = unidade.getDistribuidora();
+
+                Integer countCidade = template.queryForObject(
                         "SELECT COUNT(*) FROM cidade WHERE nome = ?",
                         Integer.class,
-                        UnidadeDistribuidora.getDistribuidora()
+                        unidade.getNome()
                 );
 
-                if (countDistros > 0) {
-                    continue;
-                }
+                if (countCidade > 0) continue;
 
                 Integer idDistribuidora = template.queryForObject(
                         "SELECT id_distribuidora FROM distribuidora WHERE nome = ?",
                         Integer.class,
-                        interrupcaoCidade.getDistribuidora()
+                        distribuidora.getDistribuidora()
                 );
 
                 if (idDistribuidora == null) {
-                    System.out.println("Distribuidora " + interrupcaoCidade.getDistribuidora() + " não encontrada. Pulando inserção.");
+                    System.out.println("Distribuidora " + distribuidora.getDistribuidora() + " não encontrada. Pulando inserção.");
                     continue;
                 }
 
-
                 template.update(
                         "INSERT INTO cidade (nome, fk_distribuidora) VALUES (?, ?)",
-                        interrupcaoCidade.getUnidadeConsumidora(),
+                        unidade.getNome(),
                         idDistribuidora
                 );
-            }
-            catch (DataAccessException e) {
-                System.err.println("Erro ao inserir interrupção ID " + interrupcaoCidade.getId() + ": " + e.getMessage());
-
-
-                // Teste de adicionar dados ao logggg
-
+            } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir cidade";
-                Log log = new Log("ERRO",erroInserir, e.getMessage());
-
-                LogInserir loginserir = new LogInserir(template);
-                loginserir.registrarLog(log);
+                Log log = new Log("ERRO", erroInserir, e.getMessage());
+                new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
-
-
-                // FIm do teste de adicionar ao log
             }
         }
 
         // inserção do motivo
-
-        for (Interrupcao interrupcoeMotivo : interrupcoes) {
-            try{
-                Integer countfatorGerador = template.queryForObject(
+        for (Interrupcao interrupcaoMotivo : interrupcoes) {
+            try {
+                Integer countFator = template.queryForObject(
                         "SELECT COUNT(*) FROM motivo WHERE nome = ?",
                         Integer.class,
-                        interrupcoeMotivo.getFatorGerador()
+                        interrupcaoMotivo.getFatorGerador()
                 );
 
-                if (countfatorGerador > 0) {
-                    continue;
-                }
+                if (countFator > 0) continue;
 
                 template.update(
                         "INSERT INTO motivo (nome) VALUES (?)",
-                        interrupcoeMotivo.getFatorGerador()
+                        interrupcaoMotivo.getFatorGerador()
                 );
-            }
-            catch (DataAccessException e) {
-                System.err.println("Erro ao inserir interrupção ID " + interrupcoeMotivo.getId() + ": " + e.getMessage());
-
-
-                // Teste de adicionar dados ao logggg
-
-                String erroInserir = "Erro ao inserir motivo ";
-                Log log = new Log("ERRO",erroInserir, e.getMessage());
-
-                LogInserir loginserir = new LogInserir(template);
-                loginserir.registrarLog(log);
+            } catch (DataAccessException e) {
+                String erroInserir = "Erro ao inserir motivo";
+                Log log = new Log("ERRO", erroInserir, e.getMessage());
+                new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
-
-
-                // FIm do teste de adicionar ao log
             }
         }
 
         // inserção da interrupção
-
         for (Interrupcao interrupcao : interrupcoes) {
             try {
                 Integer countID = template.queryForObject(
@@ -236,21 +195,19 @@ public class Main {
                         interrupcao.getId()
                 );
 
-                if (countID > 0) {
-                    continue;
-                }
+                if (countID > 0) continue;
 
+                UnidadeDistribuidora unidade = interrupcao.getUnidadeConsumidora();
                 Integer idCidade = template.queryForObject(
                         "SELECT id_cidade FROM cidade WHERE nome = ?",
                         Integer.class,
-                        interrupcao.getUnidadeConsumidora()
+                        unidade.getNome()
                 );
 
                 if (idCidade == null) {
-                    System.out.println("Cidade " + interrupcao.getUnidadeConsumidora() + " não encontrada. Pulando inserção.");
+                    System.out.println("Cidade " + unidade.getNome() + " não encontrada. Pulando inserção.");
                     continue;
                 }
-
 
                 Integer idMotivo = template.queryForObject(
                         "SELECT id_motivo FROM motivo WHERE nome = ?",
@@ -271,28 +228,16 @@ public class Main {
                         idCidade,
                         idMotivo
                 );
+
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
             } catch (DataAccessException e) {
-                System.err.println("Erro ao inserir interrupção ID " + interrupcao.getId() + ": " + e.getMessage());
-
-
-                // Teste de adicionar dados ao logggg
-
                 String erroInserir = "Erro ao inserir interrupção";
-                Log log = new Log("ERRO",erroInserir, e.getMessage());
-
-                LogInserir loginserir = new LogInserir(template);
-                loginserir.registrarLog(log);
+                Log log = new Log("ERRO", erroInserir, e.getMessage());
+                new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
-
-
-                // FIm do teste de adicionar ao log
-
             }
         }
 
         System.out.println("Passei no teste!");
-
     }
-
 }
