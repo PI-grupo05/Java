@@ -1,6 +1,7 @@
-package school.sptech;
+package school.sptech.service;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import school.sptech.modulos.Log;
 
 import java.util.List;
 

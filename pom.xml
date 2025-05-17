@@ -63,7 +63,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>school.sptech.Main</mainClass>
+              <mainClass>school.sptech.main.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

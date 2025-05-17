@@ -1,4 +1,4 @@
-package school.sptech;
+package school.sptech.modulos;
 
 import java.time.LocalDateTime;
 

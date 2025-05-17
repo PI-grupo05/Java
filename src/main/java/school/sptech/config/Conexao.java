@@ -1,7 +1,6 @@
-package school.sptech;
+package school.sptech.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -17,10 +16,14 @@ public class Conexao{
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("41465490Fe");
 
+<<<<<<< HEAD:src/main/java/school/sptech/Conexao.java
         // basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         // basicDataSource.setUrl("jdbc:mysql://localhost:3306/dataryzer?useSSL=false&serverTimezone=UTC");
         // basicDataSource.setUsername("root");
         // basicDataSource.setPassword("68719503Gu$");
+=======
+
+>>>>>>> testeNovasClasses:src/main/java/school/sptech/config/Conexao.java
 
 
         // Configurações opcionais (recomendadas para produção)
