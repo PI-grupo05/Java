@@ -3,99 +3,90 @@ package school.sptech.main;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import school.sptech.config.Conexao;
+import school.sptech.config.S3Provider;
 import school.sptech.modulos.Distribuidora;
 import school.sptech.modulos.Interrupcao;
 import school.sptech.modulos.Log;
 import school.sptech.modulos.UnidadeDistribuidora;
 import school.sptech.service.LeitorExcel;
 import school.sptech.service.LogInserir;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        String nomeArquivo = "paraTreinarApache.xlsx";
+        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
+        String nomeBucket = "dataryzer";
+        List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
+        Conexao conexao = new Conexao();
+        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+        // Ferramenta que fará a leitura
+        InputStream arquivo = null;
 
-        // Carregando o arquivo excel
-        Path caminho = Path.of(nomeArquivo);
-        InputStream arquivo = Files.newInputStream(caminho);
+        //Para acessar a S3
+        S3Client s3Client = new S3Provider().getS3Client();
 
-        // Extraindo os livros do arquivo
-        LeitorExcel leitorExcel = new LeitorExcel();
-        List<Interrupcao> interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivo, arquivo);
+        // Faz a listagem de todos os arquivos no bucket
+        try {
+            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
+            for (S3Object object : objects) {
+                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                        .bucket(nomeBucket)
+                        .key(object.key())
+                        .build();
 
-        // Fechando o arquivo após a extração
-        arquivo.close();
+                // Se achar o arquivo, guardar para realizar a leitura
+                if(object.key().equals(nomeArquivoParaProcurar)){
+                    arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+                }
+            }
+            // Extraindo as interrupções do arquivo
+            LeitorExcel leitorExcel = new LeitorExcel();
+            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+
+            // Fechando o arquivo após a extração
+            arquivo.close();
+
+            String informacao = "Exito na extração do arquivo em S3 ";
+            Log log = new Log("INFO",informacao, nomeArquivoParaProcurar);
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
 
 
-//        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
-//      //  String nomeBucket = "dataryzer";
-//        List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
-//
-//        // Ferramenta que fará a leitura
-//        InputStream arquivo = null;
-//
-//
+        } catch (  S3Exception e) {
+
+            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
+
+            // Teste de adicionar dados ao logggg
+
+            String erroInserir = "Erro ao fazer download dos arquivos: ";
+
+            Log log = new Log("ERRO",erroInserir, e.getMessage());
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
+            System.err.println("Erro capturado: " + e.getMessage());
 
 
-//        //Para acessar a S3
-//        S3Client s3Client = new S3Provider().getS3Client();
-
-//        // Faz a listagem de todos os arquivos no bucket
-//        try {
-//            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
-//            for (S3Object object : objects) {
-//                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-//                        .bucket(nomeBucket)
-//                        .key(object.key())
-//                        .build();
-//
-//            // Se achar o arquivo, guardar para realizar a leitura
-//                if(object.key().equals(nomeArquivoParaProcurar)){
-//                    arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-//                }
-//            }
-//                // Extraindo as interrupções do arquivo
-//                LeitorExcel leitorExcel = new LeitorExcel();
-//                interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
-//
-//                // Fechando o arquivo após a extração
-//                arquivo.close();
-//
-//
-//        } catch (  S3Exception e) {
-//
-//            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
-//
-//            // Teste de adicionar dados ao logggg
-//
-//            Conexao conexao = new Conexao();
-//            JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
-//            String erroInserir = "Erro ao fazer download dos arquivos: ";
-//
-//            Log log = new Log("ERRO",erroInserir, e.getMessage());
-//
-//            LogInserir loginserir = new LogInserir(template);
-//            loginserir.registrarLog(log);
-//            System.err.println("Erro capturado: " + e.getMessage());
-//
-//
-//            // FIm do teste de adicionar ao log
-//        }
+            // Fim do teste de adicionar ao log
+        }
 
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
         }
-
-        Conexao conexao = new Conexao();
-        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
 
         // inserção distribuidora
         for (Interrupcao interrupcaoDistro : interrupcoes) {
