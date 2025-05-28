@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -83,6 +84,47 @@ public class Main {
             // Fim do teste de adicionar ao log
         }
 
+
+        // Codigo para ler localmente e fazer a inserções
+
+//        ==============================================================
+//        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
+//        List<Interrupcao> interrupcoes = new ArrayList<>();
+//        Conexao conexao = new Conexao();
+//        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+//
+//        String caminhoArquivoLocal = "./" + nomeArquivoParaProcurar; // Exemplo: na mesma pasta do projeto
+//
+//        InputStream arquivo = null;
+//
+//        try {
+//            arquivo = new FileInputStream(caminhoArquivoLocal);
+//
+//            LeitorExcel leitorExcel = new LeitorExcel();
+//            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+//
+//            arquivo.close();
+//
+//            String informacao = "Exito na extração do arquivo local " + nomeArquivoParaProcurar;
+//            Log log = new Log("INFO", informacao, nomeArquivoParaProcurar);
+//
+//            LogInserir loginserir = new LogInserir(template);
+//            loginserir.registrarLog(log);
+//
+//        } catch (Exception e) {
+//            System.err.println("Erro ao ler o arquivo local: " + e.getMessage());
+//
+//            String erroInserir = "Erro ao ler o arquivo local: ";
+//            Log log = new Log("ERRO", erroInserir, e.getMessage());
+//
+//            LogInserir loginserir = new LogInserir(template);
+//            loginserir.registrarLog(log);
+//
+//            System.err.println("Erro capturado: " + e.getMessage());
+//        }
+//        ===================================================================
+        // fim teste de leitura do arquivoo teste
+
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
             System.out.println(interrupcao);
@@ -117,18 +159,19 @@ public class Main {
         }
 
         // inserção da cidade
-        for (Interrupcao interrupcaoCidade : interrupcoes) {
+        for (Interrupcao  interrupcaoUnidadeConsumidora : interrupcoes) {
             try {
-                UnidadeDistribuidora unidade = interrupcaoCidade.getUnidadeConsumidora();
+                UnidadeDistribuidora unidade = interrupcaoUnidadeConsumidora.getUnidadeConsumidora();
                 Distribuidora distribuidora = unidade.getDistribuidora();
 
-                Integer countCidade = template.queryForObject(
-                        "SELECT COUNT(*) FROM cidade WHERE nome = ?",
+                Integer countUnidadeConsumidora = template.queryForObject(
+                        "SELECT COUNT(*) FROM unidade_consumidora WHERE nome = ?",
                         Integer.class,
                         unidade.getNome()
                 );
 
-                if (countCidade > 0) continue;
+
+                if (countUnidadeConsumidora > 0) continue;
 
                 Integer idDistribuidora = template.queryForObject(
                         "SELECT id_distribuidora FROM distribuidora WHERE nome = ?",
@@ -141,18 +184,26 @@ public class Main {
                     continue;
                 }
 
+
+
                 template.update(
-                        "INSERT INTO cidade (nome, fk_distribuidora) VALUES (?, ?)",
+                        "INSERT INTO unidade_consumidora (nome, fk_distribuidora) VALUES (?, ?)",
                         unidade.getNome(),
                         idDistribuidora
                 );
             } catch (DataAccessException e) {
-                String erroInserir = "Erro ao inserir cidade";
+                String erroInserir = "Erro ao inserir unidade cosumidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
                 new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
             }
         }
+
+        //Exemplo para unidade_consumidora teste
+
+
+
+        // Fim teste para unidade consumidora.....
 
         // inserção do motivo
         for (Interrupcao interrupcaoMotivo : interrupcoes) {
@@ -190,7 +241,7 @@ public class Main {
 
                 UnidadeDistribuidora unidade = interrupcao.getUnidadeConsumidora();
                 Integer idCidade = template.queryForObject(
-                        "SELECT id_cidade FROM cidade WHERE nome = ?",
+                        "SELECT id_unidade_consumidora FROM unidade_consumidora WHERE nome = ?",
                         Integer.class,
                         unidade.getNome()
                 );
@@ -212,7 +263,7 @@ public class Main {
                 }
 
                 template.update(
-                        "INSERT INTO interrupcao (id_interrupcao, dt_inicio, dt_fim, fk_cidade, fk_motivo) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO interrupcao (id_interrupcao, dt_inicio, dt_fim, fk_unidade_consumidora, fk_motivo) VALUES (?, ?, ?, ?, ?)",
                         interrupcao.getId(),
                         interrupcao.getInicio(),
                         interrupcao.getFim(),
