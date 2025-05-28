@@ -1,7 +1,9 @@
 package school.sptech.main;
 
+import org.json.JSONObject;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import school.sptech.Slack;
 import school.sptech.config.Conexao;
 import school.sptech.config.S3Provider;
 import school.sptech.modulos.Distribuidora;
@@ -25,7 +27,7 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException,InterruptedException{
 
         String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
         String nomeBucket = "dataryzer";
@@ -37,6 +39,12 @@ public class Main {
 
         //Para acessar a S3
         S3Client s3Client = new S3Provider().getS3Client();
+
+        //instanciando JSONObject
+        JSONObject jsonDistro = new JSONObject();
+        JSONObject jsonUnidadeDistribuidora = new JSONObject();
+        JSONObject jsonMotivo = new JSONObject();
+        JSONObject jsonInterrupcao = new JSONObject();
 
         // Faz a listagem de todos os arquivos no bucket
         try {
@@ -150,6 +158,9 @@ public class Main {
                         distro.getDistribuidora(),
                         distro.getSiglaDistro()
                 );
+
+                jsonDistro.put("text","Nova distribuidora inserida :red_exclamation_mark:");
+                Slack.enviarMensagem(jsonDistro);
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir distribuidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -191,6 +202,9 @@ public class Main {
                         unidade.getNome(),
                         idDistribuidora
                 );
+
+                jsonUnidadeDistribuidora.put("text","Nova unidade consumidora inserida :red_exclamation_mark:");
+                Slack.enviarMensagem(jsonUnidadeDistribuidora);
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir unidade cosumidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -220,6 +234,9 @@ public class Main {
                         "INSERT INTO motivo (nome) VALUES (?)",
                         interrupcaoMotivo.getFatorGerador()
                 );
+
+                jsonMotivo.put("text","Novo motivo inserido :red_exclamation_mark:");
+                Slack.enviarMensagem(jsonMotivo);
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir motivo";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -272,6 +289,9 @@ public class Main {
                 );
 
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
+
+                jsonInterrupcao.put("text","Nova interrupção inserida :red_exclamation_mark:");
+                Slack.enviarMensagem(jsonInterrupcao);
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir interrupção";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
