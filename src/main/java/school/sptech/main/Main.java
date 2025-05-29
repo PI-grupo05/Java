@@ -46,6 +46,11 @@ public class Main {
         JSONObject jsonMotivo = new JSONObject();
         JSONObject jsonInterrupcao = new JSONObject();
 
+        Integer contDistro = 0;
+        Integer contUni = 0;
+        Integer contMotivo = 0;
+        Integer contInterrupcao = 0;
+
         // Faz a listagem de todos os arquivos no bucket
         try {
             List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
@@ -159,14 +164,18 @@ public class Main {
                         distro.getSiglaDistro()
                 );
 
-                jsonDistro.put("text","Nova distribuidora inserida :red_exclamation_mark:");
-                Slack.enviarMensagem(jsonDistro);
+                contDistro++;
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir distribuidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
                 new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
             }
+        }
+
+        if(contDistro >= 1) {
+            jsonDistro.put("text", "Nova distribuidora inserida ✅");
+            Slack.enviarMensagem(jsonDistro);
         }
 
         // inserção da cidade
@@ -203,8 +212,9 @@ public class Main {
                         idDistribuidora
                 );
 
-                jsonUnidadeDistribuidora.put("text","Nova unidade consumidora inserida :red_exclamation_mark:");
-                Slack.enviarMensagem(jsonUnidadeDistribuidora);
+                contUni++;
+
+
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir unidade cosumidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -213,6 +223,10 @@ public class Main {
             }
         }
 
+        if(contUni >= 1) {
+            jsonUnidadeDistribuidora.put("text", "Nova unidade consumidora inserida ✅");
+            Slack.enviarMensagem(jsonUnidadeDistribuidora);
+        }
         //Exemplo para unidade_consumidora teste
 
 
@@ -235,14 +249,19 @@ public class Main {
                         interrupcaoMotivo.getFatorGerador()
                 );
 
-                jsonMotivo.put("text","Novo motivo inserido :red_exclamation_mark:");
-                Slack.enviarMensagem(jsonMotivo);
+                contMotivo++;
+
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir motivo";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
                 new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
             }
+        }
+
+        if(contMotivo >= 1) {
+            jsonMotivo.put("text", "Novo motivo inserido ❗");
+            Slack.enviarMensagem(jsonMotivo);
         }
 
         // inserção da interrupção
@@ -290,14 +309,17 @@ public class Main {
 
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
 
-                jsonInterrupcao.put("text","Nova interrupção inserida :red_exclamation_mark:");
-                Slack.enviarMensagem(jsonInterrupcao);
+                contInterrupcao++;
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir interrupção";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
                 new LogInserir(template).registrarLog(log);
                 System.err.println("Erro capturado: " + e.getMessage());
             }
+        }
+        if(contInterrupcao >= 1){
+            jsonInterrupcao.put("text","Nova interrupção inserida Acesse www.dataryzer.com para acompanhar.");
+            Slack.enviarMensagem(jsonInterrupcao);
         }
 
         System.out.println("Passei no teste!");
