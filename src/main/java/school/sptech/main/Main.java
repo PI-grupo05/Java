@@ -3,7 +3,7 @@ package school.sptech.main;
 import org.json.JSONObject;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import school.sptech.Slack;
+import school.sptech.config.Slack;
 import school.sptech.config.Conexao;
 import school.sptech.config.S3Provider;
 import school.sptech.modulos.Distribuidora;

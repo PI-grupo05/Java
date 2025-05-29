@@ -1,4 +1,4 @@
-package school.sptech;
+package school.sptech.config;
 
 import org.json.JSONObject;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.net.http.HttpResponse;
 
 public class Slack {
     private static HttpClient client = HttpClient.newHttpClient();
-    private static final String URL = "Link do webhook";
+    private static final String URL = "https://hooks.slack.com/services/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";
 
     public static void enviarMensagem(JSONObject content) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder(
