@@ -3,21 +3,10 @@ package school.sptech.main;
 import org.json.JSONObject;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import school.sptech.config.Slack;
 import school.sptech.config.Conexao;
-import school.sptech.config.S3Provider;
-import school.sptech.modulos.Distribuidora;
-import school.sptech.modulos.Interrupcao;
-import school.sptech.modulos.Log;
-import school.sptech.modulos.UnidadeDistribuidora;
+import school.sptech.modulos.*;
 import school.sptech.service.LeitorExcel;
 import school.sptech.service.LogInserir;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,16 +18,16 @@ public class Main {
 
     public static void main(String[] args) throws IOException,InterruptedException{
 
-        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
-        String nomeBucket = "dataryzer";
-        List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
-        Conexao conexao = new Conexao();
-        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
-        // Ferramenta que fará a leitura
-        InputStream arquivo = null;
-
-        //Para acessar a S3
-        S3Client s3Client = new S3Provider().getS3Client();
+//        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
+//        String nomeBucket = "dataryzer";
+//        List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
+//        Conexao conexao = new Conexao();
+//        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+//        // Ferramenta que fará a leitura
+//        InputStream arquivo = null;
+//
+//        //Para acessar a S3
+//        S3Client s3Client = new S3Provider().getS3Client();
 
         //instanciando JSONObject
         JSONObject jsonDistro = new JSONObject();
@@ -51,92 +40,92 @@ public class Main {
         Integer contMotivo = 0;
         Integer contInterrupcao = 0;
 
-        // Faz a listagem de todos os arquivos no bucket
-        try {
-            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
-            for (S3Object object : objects) {
-                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                        .bucket(nomeBucket)
-                        .key(object.key())
-                        .build();
-
-                // Se achar o arquivo, guardar para realizar a leitura
-                if(object.key().equals(nomeArquivoParaProcurar)){
-                    arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-                }
-            }
-            // Extraindo as interrupções do arquivo
-            LeitorExcel leitorExcel = new LeitorExcel();
-            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
-
-            // Fechando o arquivo após a extração
-            arquivo.close();
-
-            String informacao = "Exito na extração do arquivo em S3 ";
-            Log log = new Log("INFO",informacao, nomeArquivoParaProcurar);
-
-            LogInserir loginserir = new LogInserir(template);
-            loginserir.registrarLog(log);
-
-
-        } catch (  S3Exception e) {
-
-            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
-
-            // Teste de adicionar dados ao logggg
-
-            String erroInserir = "Erro ao fazer download dos arquivos: ";
-
-            Log log = new Log("ERRO",erroInserir, e.getMessage());
-
-            LogInserir loginserir = new LogInserir(template);
-            loginserir.registrarLog(log);
-            System.err.println("Erro capturado: " + e.getMessage());
-
-
-            // Fim do teste de adicionar ao log
-        }
+//        // Faz a listagem de todos os arquivos no bucket
+//        try {
+//            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(nomeBucket).build()).contents();
+//            for (S3Object object : objects) {
+//                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+//                        .bucket(nomeBucket)
+//                        .key(object.key())
+//                        .build();
+//
+//                // Se achar o arquivo, guardar para realizar a leitura
+//                if(object.key().equals(nomeArquivoParaProcurar)){
+//                    arquivo = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+//                }
+//            }
+//            // Extraindo as interrupções do arquivo
+//            LeitorExcel leitorExcel = new LeitorExcel();
+//            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+//
+//            // Fechando o arquivo após a extração
+//            arquivo.close();
+//
+//            String informacao = "Exito na extração do arquivo em S3 ";
+//            Log log = new Log("INFO",informacao, nomeArquivoParaProcurar);
+//
+//            LogInserir loginserir = new LogInserir(template);
+//            loginserir.registrarLog(log);
+//
+//
+//        } catch (  S3Exception e) {
+//
+//            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
+//
+//            // Teste de adicionar dados ao logggg
+//
+//            String erroInserir = "Erro ao fazer download dos arquivos: ";
+//
+//            Log log = new Log("ERRO",erroInserir, e.getMessage());
+//
+//            LogInserir loginserir = new LogInserir(template);
+//            loginserir.registrarLog(log);
+//            System.err.println("Erro capturado: " + e.getMessage());
+//
+//
+//            // Fim do teste de adicionar ao log
+//        }
 
 
         // Codigo para ler localmente e fazer a inserções
 
 //        ==============================================================
-//        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
-//        List<Interrupcao> interrupcoes = new ArrayList<>();
-//        Conexao conexao = new Conexao();
-//        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
-//
-//        String caminhoArquivoLocal = "./" + nomeArquivoParaProcurar; // Exemplo: na mesma pasta do projeto
-//
-//        InputStream arquivo = null;
-//
-//        try {
-//            arquivo = new FileInputStream(caminhoArquivoLocal);
-//
-//            LeitorExcel leitorExcel = new LeitorExcel();
-//            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
-//
-//            arquivo.close();
-//
-//            String informacao = "Exito na extração do arquivo local " + nomeArquivoParaProcurar;
-//            Log log = new Log("INFO", informacao, nomeArquivoParaProcurar);
-//
-//            LogInserir loginserir = new LogInserir(template);
-//            loginserir.registrarLog(log);
-//
-//        } catch (Exception e) {
-//            System.err.println("Erro ao ler o arquivo local: " + e.getMessage());
-//
-//            String erroInserir = "Erro ao ler o arquivo local: ";
-//            Log log = new Log("ERRO", erroInserir, e.getMessage());
-//
-//            LogInserir loginserir = new LogInserir(template);
-//            loginserir.registrarLog(log);
-//
-//            System.err.println("Erro capturado: " + e.getMessage());
-//        }
+        String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
+        List<Interrupcao> interrupcoes = new ArrayList<>();
+        Conexao conexao = new Conexao();
+        JdbcTemplate template = new JdbcTemplate(conexao.getConexao());
+
+        String caminhoArquivoLocal = "./" + nomeArquivoParaProcurar; // Exemplo: na mesma pasta do projeto
+
+        InputStream arquivo = null;
+
+        try {
+            arquivo = new FileInputStream(nomeArquivoParaProcurar);
+
+            LeitorExcel leitorExcel = new LeitorExcel();
+            interrupcoes = leitorExcel.extrairInterrupcoes(nomeArquivoParaProcurar, arquivo);
+
+            arquivo.close();
+
+            String informacao = "Exito na extração do arquivo local " + nomeArquivoParaProcurar;
+            Log log = new Log("INFO", informacao, nomeArquivoParaProcurar);
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
+
+        } catch (Exception e) {
+            System.err.println("Erro ao ler o arquivo local: " + e.getMessage());
+
+            String erroInserir = "Erro ao ler o arquivo local: ";
+            Log log = new Log("ERRO", erroInserir, e.getMessage());
+
+            LogInserir loginserir = new LogInserir(template);
+            loginserir.registrarLog(log);
+
+            System.err.println("Erro capturado: " + e.getMessage());
+        }
 //        ===================================================================
-        // fim teste de leitura do arquivoo teste
+        // fim teste de leitura do arquivo teste
 
         System.out.println("Interrupções extraídas:");
         for (Interrupcao interrupcao : interrupcoes) {
@@ -148,11 +137,10 @@ public class Main {
             try {
                 Distribuidora distro = interrupcaoDistro.getUnidadeConsumidora().getDistribuidora();
 
-
                 Integer countDistros = template.queryForObject(
-                        "SELECT COUNT(*) FROM distribuidora WHERE nome = ?",
+                        "SELECT COUNT(*) FROM distribuidora WHERE cnpj = ?",
                         Integer.class,
-                        distro.getDistribuidora()
+                        distro.getCnpj()
                 );
 
                 if (countDistros > 0) continue;
@@ -160,11 +148,9 @@ public class Main {
                 template.update(
                         "INSERT INTO distribuidora (cnpj, nome, sigla) VALUES (?, ?, ?)",
                         distro.getCnpj(),
-                        distro.getDistribuidora(),
+                        distro.getNomeDistribuidora(),
                         distro.getSiglaDistro()
                 );
-
-                contDistro++;
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir distribuidora";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -173,10 +159,8 @@ public class Main {
             }
         }
 
-        if(contDistro >= 1) {
-            jsonDistro.put("text", "Nova distribuidora inserida ✅");
-            Slack.enviarMensagem(jsonDistro);
-        }
+        DistribuidoraNotificacao notificacao = new DistribuidoraNotificacao();
+        List<DistribuidoraNotificacao> notificacoes = notificacao.pegarDistribuidorasExistentes();
 
         // inserção da cidade
         for (Interrupcao  interrupcaoUnidadeConsumidora : interrupcoes) {
@@ -185,26 +169,26 @@ public class Main {
                 Distribuidora distribuidora = unidade.getDistribuidora();
 
                 Integer countUnidadeConsumidora = template.queryForObject(
-                        "SELECT COUNT(*) FROM unidade_consumidora WHERE nome = ?",
+                        "SELECT COUNT(*) FROM unidade_consumidora " +
+                                "join distribuidora on fk_distribuidora = id_distribuidora" +
+                                " WHERE unidade_consumidora.nome = ? and cnpj = ? limit 1",
                         Integer.class,
-                        unidade.getNome()
+                        unidade.getNome(),
+                        distribuidora.getCnpj()
                 );
-
 
                 if (countUnidadeConsumidora > 0) continue;
 
                 Integer idDistribuidora = template.queryForObject(
                         "SELECT id_distribuidora FROM distribuidora WHERE nome = ?",
                         Integer.class,
-                        distribuidora.getDistribuidora()
+                        distribuidora.getNomeDistribuidora()
                 );
 
                 if (idDistribuidora == null) {
-                    System.out.println("Distribuidora " + distribuidora.getDistribuidora() + " não encontrada. Pulando inserção.");
+                    System.out.println("Distribuidora " + distribuidora.getNomeDistribuidora() + " não encontrada. Pulando inserção.");
                     continue;
                 }
-
-
 
                 template.update(
                         "INSERT INTO unidade_consumidora (nome, fk_distribuidora) VALUES (?, ?)",
@@ -213,7 +197,13 @@ public class Main {
                 );
 
                 contUni++;
-
+                if(contUni > 0){
+                    for (DistribuidoraNotificacao notificacaoDefinida : notificacoes) {
+                        if(notificacaoDefinida.getDistribuidora().getNomeDistribuidora().equals(interrupcaoUnidadeConsumidora.getUnidadeConsumidora().getDistribuidora().getNomeDistribuidora())){
+                            notificacaoDefinida.setTeveNovaUnidadeConsumidora(true);
+                        }
+                    }
+                }
 
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir unidade cosumidora";
@@ -222,16 +212,6 @@ public class Main {
                 System.err.println("Erro capturado: " + e.getMessage());
             }
         }
-
-        if(contUni >= 1) {
-            jsonUnidadeDistribuidora.put("text", "Nova unidade consumidora inserida ✅");
-            Slack.enviarMensagem(jsonUnidadeDistribuidora);
-        }
-        //Exemplo para unidade_consumidora teste
-
-
-
-        // Fim teste para unidade consumidora.....
 
         // inserção do motivo
         for (Interrupcao interrupcaoMotivo : interrupcoes) {
@@ -242,6 +222,7 @@ public class Main {
                         interrupcaoMotivo.getFatorGerador()
                 );
 
+
                 if (countFator > 0) continue;
 
                 template.update(
@@ -250,6 +231,13 @@ public class Main {
                 );
 
                 contMotivo++;
+                if(contMotivo > 0){
+                    for (DistribuidoraNotificacao notificacaoDefinida : notificacoes) {
+                        if(notificacaoDefinida.getDistribuidora().getNomeDistribuidora().equals(interrupcaoMotivo.getUnidadeConsumidora().getDistribuidora().getNomeDistribuidora())){
+                            notificacaoDefinida.setTeveNovoMotivo(true);
+                        }
+                    }
+                }
 
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir motivo";
@@ -259,27 +247,29 @@ public class Main {
             }
         }
 
-        if(contMotivo >= 1) {
-            jsonMotivo.put("text", "Novo motivo inserido ❗");
-            Slack.enviarMensagem(jsonMotivo);
-        }
-
         // inserção da interrupção
         for (Interrupcao interrupcao : interrupcoes) {
             try {
                 Integer countID = template.queryForObject(
-                        "SELECT COUNT(*) FROM interrupcao WHERE id_interrupcao = ?",
+                        "SELECT COUNT(*) FROM interrupcao " +
+                                "join unidade_consumidora on fk_unidade_consumidora = id_unidade_consumidora " +
+                                "join distribuidora on fk_distribuidora = id_distribuidora " +
+                                "WHERE id_interrupcao = ? and cnpj = ?",
                         Integer.class,
-                        interrupcao.getId()
+                        interrupcao.getId(),
+                        interrupcao.getUnidadeConsumidora().getDistribuidora().getCnpj()
                 );
 
                 if (countID > 0) continue;
 
                 UnidadeDistribuidora unidade = interrupcao.getUnidadeConsumidora();
                 Integer idCidade = template.queryForObject(
-                        "SELECT id_unidade_consumidora FROM unidade_consumidora WHERE nome = ?",
+                        "SELECT id_unidade_consumidora FROM unidade_consumidora " +
+                                "join distribuidora on fk_distribuidora = id_distribuidora " +
+                                "WHERE unidade_consumidora.nome = ? and cnpj = ?",
                         Integer.class,
-                        unidade.getNome()
+                        unidade.getNome(),
+                        unidade.getDistribuidora().getCnpj()
                 );
 
                 if (idCidade == null) {
@@ -310,6 +300,13 @@ public class Main {
                 System.out.println("Inserida interrupção ID: " + interrupcao.getId());
 
                 contInterrupcao++;
+                if(contInterrupcao > 0){
+                    for (DistribuidoraNotificacao notificacaoDefinida : notificacoes) {
+                        if(notificacaoDefinida.getDistribuidora().getNomeDistribuidora().equals(interrupcao.getUnidadeConsumidora().getDistribuidora().getNomeDistribuidora())){
+                            notificacaoDefinida.setTeveNovaInterrupcao(true);
+                        }
+                    }
+                }
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir interrupção";
                 Log log = new Log("ERRO", erroInserir, e.getMessage());
@@ -317,11 +314,9 @@ public class Main {
                 System.err.println("Erro capturado: " + e.getMessage());
             }
         }
-        if(contInterrupcao >= 1){
-            jsonInterrupcao.put("text","Nova interrupção inserida Acesse www.dataryzer.com para acompanhar.");
-            Slack.enviarMensagem(jsonInterrupcao);
-        }
 
         System.out.println("Passei no teste!");
+        System.out.println(notificacoes);
+        Parametrizacao.enviarMensagem(notificacoes);
     }
 }

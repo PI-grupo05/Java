@@ -21,14 +21,6 @@ public class Interrupcao {
         this.unidadeConsumidora = unidadeConsumidora;
     }
 
-//    public Interrupcao(Integer id, UnidadeDistribuidora unidadeConsumidora, LocalDateTime inicio, LocalDateTime fim, String fatorGerador) {
-//        this.id = id;
-//        this.unidadeConsumidora = unidadeConsumidora;
-//        this.inicio = inicio;
-//        this.fim = fim;
-//        this.fatorGerador = fatorGerador;
-//    }
-
     public Integer getId() {
         return id;
     }
@@ -79,6 +71,4 @@ public class Interrupcao {
                 ", fatorGerador='" + fatorGerador + '\'' +
                 '}';
     }
-
-
 }
