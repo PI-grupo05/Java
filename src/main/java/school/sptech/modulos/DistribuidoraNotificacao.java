@@ -9,7 +9,6 @@ import java.util.List;
 public class DistribuidoraNotificacao {
     private Boolean teveNovaInterrupcao;
     private Boolean teveNovaUnidadeConsumidora;
-    private Boolean teveNovoMotivo;
     private Distribuidora distribuidora;
 
     public DistribuidoraNotificacao() {
@@ -18,7 +17,6 @@ public class DistribuidoraNotificacao {
     public DistribuidoraNotificacao(Distribuidora distribuidora) {
         this.teveNovaInterrupcao = false;
         this.teveNovaUnidadeConsumidora = false;
-        this.teveNovoMotivo = false;
         this.distribuidora = distribuidora;
     }
 
@@ -38,14 +36,6 @@ public class DistribuidoraNotificacao {
         this.teveNovaUnidadeConsumidora = teveNovaUnidadeConsumidora;
     }
 
-    public Boolean getTeveNovoMotivo() {
-        return teveNovoMotivo;
-    }
-
-    public void setTeveNovoMotivo(Boolean teveNovoMotivo) {
-        this.teveNovoMotivo = teveNovoMotivo;
-    }
-
     public Distribuidora getDistribuidora() {
         return distribuidora;
     }
@@ -56,10 +46,9 @@ public class DistribuidoraNotificacao {
 
     @Override
     public String toString() {
-        return "Notificacao{" +
+        return "DistribuidoraNotificacao{" +
                 "teveNovaInterrupcao=" + teveNovaInterrupcao +
                 ", teveNovaUnidadeConsumidora=" + teveNovaUnidadeConsumidora +
-                ", teveNovoMotivo=" + teveNovoMotivo +
                 ", distribuidora=" + distribuidora +
                 '}';
     }

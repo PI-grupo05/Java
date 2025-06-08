@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Main {
 
@@ -35,9 +36,7 @@ public class Main {
         JSONObject jsonMotivo = new JSONObject();
         JSONObject jsonInterrupcao = new JSONObject();
 
-        Integer contDistro = 0;
         Integer contUni = 0;
-        Integer contMotivo = 0;
         Integer contInterrupcao = 0;
 
 //        // Faz a listagem de todos os arquivos no bucket
@@ -145,11 +144,24 @@ public class Main {
 
                 if (countDistros > 0) continue;
 
+                String uuidCurto;
+                Integer countUuidExistente = 0;
+
+                do {
+                    uuidCurto = UUID.randomUUID().toString().replace("-", "").substring(0, 5);
+                    countUuidExistente = template.queryForObject(
+                            "SELECT COUNT(*) FROM distribuidora WHERE codigo_associacao_master = ?",
+                            Integer.class,
+                            uuidCurto
+                    );
+                } while (countUuidExistente > 0);
+
                 template.update(
-                        "INSERT INTO distribuidora (cnpj, nome, sigla) VALUES (?, ?, ?)",
+                        "INSERT INTO distribuidora (cnpj, nome, sigla, codigo_associacao_master) VALUES (?, ?, ?, ?)",
                         distro.getCnpj(),
                         distro.getNomeDistribuidora(),
-                        distro.getSiglaDistro()
+                        distro.getSiglaDistro(),
+                        uuidCurto
                 );
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir distribuidora";
@@ -229,15 +241,6 @@ public class Main {
                         "INSERT INTO motivo (nome) VALUES (?)",
                         interrupcaoMotivo.getFatorGerador()
                 );
-
-                contMotivo++;
-                if(contMotivo > 0){
-                    for (DistribuidoraNotificacao notificacaoDefinida : notificacoes) {
-                        if(notificacaoDefinida.getDistribuidora().getNomeDistribuidora().equals(interrupcaoMotivo.getUnidadeConsumidora().getDistribuidora().getNomeDistribuidora())){
-                            notificacaoDefinida.setTeveNovoMotivo(true);
-                        }
-                    }
-                }
 
             } catch (DataAccessException e) {
                 String erroInserir = "Erro ao inserir motivo";

@@ -1,6 +1,7 @@
 package school.sptech.modulos;
 
 import org.json.JSONObject;
+import org.springframework.cglib.core.Local;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import school.sptech.config.Conexao;
@@ -104,22 +105,20 @@ public class Parametrizacao {
             if(parametrizacao.receberNotificacao.equals(false)){
                 continue;
             }
-            else if(parametrizacao.proximaNotificacao.equals(LocalDate.now()) ||
-            parametrizacao.proximaNotificacao.isBefore(LocalDate.now())){
+            else if(parametrizacao.proximaNotificacao == null || parametrizacao.proximaNotificacao.isBefore(LocalDate.now())){
+                parametrizacao.proximaNotificacao = LocalDate.now();
+            }
+            if(parametrizacao.proximaNotificacao.equals(LocalDate.now())){
                 for (DistribuidoraNotificacao distribuidoraNotificacao : distribuidoraNotificacoes) {
                     if(parametrizacao.fk_distribuidora.equals(distribuidoraNotificacao.getDistribuidora().getIdDistribuidora())){
                         String mensagem = "";
 
                         if(distribuidoraNotificacao.getTeveNovaInterrupcao().equals(true)){
-                            mensagem += "Nova interrupção inserida\n";
+                            mensagem += "Nova interrupção inserida❗\n";
                         }
 
                         if(distribuidoraNotificacao.getTeveNovaUnidadeConsumidora().equals(true)){
                             mensagem += "Nova unidade consumidora inserida ✅\n";
-                        }
-
-                        if(distribuidoraNotificacao.getTeveNovoMotivo().equals(true)){
-                            mensagem += "Novo motivo inserido❗\n";
                         }
 
                         if(mensagem.isBlank()){
@@ -162,9 +161,6 @@ public class Parametrizacao {
                     }
                 }
             }
-
         }
-
-
     }
 }
