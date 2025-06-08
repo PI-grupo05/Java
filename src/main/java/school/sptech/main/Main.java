@@ -30,12 +30,6 @@ public class Main {
 //        //Para acessar a S3
 //        S3Client s3Client = new S3Provider().getS3Client();
 
-        //instanciando JSONObject
-        JSONObject jsonDistro = new JSONObject();
-        JSONObject jsonUnidadeDistribuidora = new JSONObject();
-        JSONObject jsonMotivo = new JSONObject();
-        JSONObject jsonInterrupcao = new JSONObject();
-
         Integer contUni = 0;
         Integer contInterrupcao = 0;
 

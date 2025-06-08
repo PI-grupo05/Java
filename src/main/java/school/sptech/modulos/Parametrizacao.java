@@ -93,10 +93,6 @@ public class Parametrizacao {
                 new BeanPropertyRowMapper<>(Parametrizacao.class));
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println(Parametrizacao.pegarParametrizacoes());
-    }
-
     private static HttpClient client = HttpClient.newHttpClient();
 
     public static void enviarMensagem(List<DistribuidoraNotificacao> distribuidoraNotificacoes) throws IOException, InterruptedException {
