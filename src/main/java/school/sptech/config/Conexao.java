@@ -11,15 +11,15 @@ public class Conexao{
     public Conexao() {
         BasicDataSource basicDataSource = new BasicDataSource();
 
-//        basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        basicDataSource.setUrl("jdbc:mysql://container-mysql:3306/dataryzer?useSSL=false&serverTimezone=UTC");
-//        basicDataSource.setUsername("root");
-//        basicDataSource.setPassword("41465490Fe");
+        basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        basicDataSource.setUrl("jdbc:mysql://container-mysql:3306/dataryzer?useSSL=false&serverTimezone=UTC");
+        basicDataSource.setUsername("root");
+        basicDataSource.setPassword("41465490Fe*");
 
-         basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-         basicDataSource.setUrl("jdbc:mysql://localhost:3306/dataryzer?useSSL=false&serverTimezone=UTC");
-         basicDataSource.setUsername("alunoPI");
-         basicDataSource.setPassword("123");
+//         basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+//         basicDataSource.setUrl("jdbc:mysql://localhost:3306/dataryzer?useSSL=false&serverTimezone=UTC");
+//         basicDataSource.setUsername("alunoPI");
+//         basicDataSource.setPassword("123");
 
         // Configurações opcionais (recomendadas para produção)
         basicDataSource.setInitialSize(5);  // Pool inicial de conexões
