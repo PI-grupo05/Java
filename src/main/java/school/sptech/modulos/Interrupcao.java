@@ -2,7 +2,7 @@ package school.sptech.modulos;
 
 import java.time.LocalDateTime;
 
-public class Interrupcao {
+public class Interrupcao extends EventoUnidade {
     private Integer id;
     private LocalDateTime inicio;
     private LocalDateTime fim;
@@ -10,15 +10,12 @@ public class Interrupcao {
 
     private UnidadeDistribuidora unidadeConsumidora; // ✅ Faltava isso
 
-    public Interrupcao() {
-    }
-
     public Interrupcao(Integer id, LocalDateTime inicio, LocalDateTime fim, String fatorGerador, UnidadeDistribuidora unidadeConsumidora) {
+        super(unidadeConsumidora);
         this.id = id;
         this.inicio = inicio;
         this.fim = fim;
         this.fatorGerador = fatorGerador;
-        this.unidadeConsumidora = unidadeConsumidora;
     }
 
     public Integer getId() {
