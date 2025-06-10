@@ -27,7 +27,7 @@ public class Main {
     public static void main(String[] args) throws IOException,InterruptedException{
 
         String nomeArquivoParaProcurar = "paraTreinarApache.xlsx";
-        String nomeBucket = "dataryzerbucket";
+        String nomeBucket = "dataryzer";
         List<Interrupcao> interrupcoes = new ArrayList<Interrupcao>();
         Conexao conexao = new Conexao();
         JdbcTemplate template = new JdbcTemplate(conexao.getConexao());

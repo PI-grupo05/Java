@@ -12,7 +12,7 @@ public class Conexao{
         BasicDataSource basicDataSource = new BasicDataSource();
 
         basicDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        basicDataSource.setUrl("jdbc:mysql://mysql:3306/dataryzer?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
+        basicDataSource.setUrl("jdbc:mysql://container-mysql:3306/dataryzer?useSSL=false&serverTimezone=UTC");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("41465490Fe*");
 
